@@ -1,9 +1,8 @@
 #pragma once
-#include <SFML/Audio.hpp>
 
 #include <SFML/Graphics.hpp>
-#include <iostream>
 #include "TextureManager.h"
+#include "math.h"
 class Character : public sf::Sprite {
 	//Combat Stats
 	float maxHp;
@@ -30,11 +29,6 @@ class Character : public sf::Sprite {
 
 
 	int counter;
-
-	//sound stuff
-	sf::SoundBuffer buffer;
-	sf::Sound sound;
-
 
 public:
 	//Constructors
@@ -74,7 +68,7 @@ public:
 
 	void pointMouseCursor(sf::RenderWindow& win);
 	void moveTowardMouse(sf::RenderWindow& win);
-	void moveToPos(sf::RenderWindow& window, sf::Vector2f pos);
+	void moveToPos(sf::Vector2f pos);
 	void moveToPos(float x, float y);
 
 	//End Game Functions

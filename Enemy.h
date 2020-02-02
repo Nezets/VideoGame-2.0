@@ -11,9 +11,9 @@ class Enemy : public Character{
 	bool meleeRange;
 	short enemyType;
 public:
-	Enemy(short x);
-	
+    Enemy();
+    Enemy(short x);
+
 	short getType();
-	void moveTowardPoint(float x, float y);
 };
 
