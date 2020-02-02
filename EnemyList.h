@@ -1,10 +1,9 @@
 #pragma once
-#include <iostream>
 #include "Enemy.h"
 #include "BulletManager.h"
 class EnemyList
 {
-	vector<Enemy*> enemies;
+	vector<Enemy> enemies;
 	BulletManager enemyBullets;
 
 public:

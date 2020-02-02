@@ -8,13 +8,11 @@ PC::PC() {
 	maxExp = 10;
 	setTexture(TextureManager::GetTexture("PC"));
 
-	setOrigin(160, 160);
+	setOrigin(157.0/2 + 5, 117.0/2);
 	setScale(0.5f, 0.5f);
 }
 
 //Getter Functions
-
-
 int PC::getExp()
 {
 	return exp;
@@ -22,11 +20,6 @@ int PC::getExp()
 int PC::getLevel()
 {
 	return level;
-}
-
-int PC::getMaxExp()
-{
-	return maxExp;
 }
 
 int PC::getDmgLevel()

@@ -1,92 +1,152 @@
-#pragma once
 #include <iostream>
 #include "TextureManager.h"
 #include "DungeonFloor.h"
 #include "PC.h"
 #include "Bullet.h"
 #include "BulletManager.h"
-#include "ProgressBar.h"
-#include "UI.h"
-#include "Enemy.h"
-#include "EnemyList.h"
+#include "SnakeBoss.h"
 
 int main() {
-	//SFML Stuff
-	sf::RenderWindow window(sf::VideoMode(800, 600), "Rouge Dungeon");
-	window.setFramerateLimit(60);
-	window.setMouseCursorVisible(false);
-	//Objects
-	DungeonFloor floor1;
-	PC pc;
-	pc.setPosition(300, 300);
-	BulletManager bullets = BulletManager();
-	sf::Sprite crosshair;
+    sf::RenderWindow window(sf::VideoMode(1200, 900), "Rouge Dungeon");
+    window.setFramerateLimit(60);
+    window.setMouseCursorVisible(false);
+    DungeonFloor floor1;
+    //PC
+    PC pc;
+    pc.setPosition(300, 300);
+    BulletManager bullets = BulletManager();
+    sf::Sprite crosshair;
+    crosshair.setOrigin(113.0/2, 113.0/2);
+    crosshair.setTexture(TextureManager::GetTexture("Crosshair"));
+    string currRoomID = "C3";
+    SnakeBoss snakeBoss;
 
-	
-	crosshair.setTexture(TextureManager::GetTexture("Crosshair"));
-	crosshair.setOrigin(crosshair.getTexture()->getSize().x/2, crosshair.getTexture()->getSize().y/2);
-	UI ui;
-	
+    // run the program as long as the window is open
+    while (window.isOpen())
+    {
+        // check all the window's events that were triggered since the last iteration of the loop
+        sf::Event event;
+        Bullet newBullet(pc.getDamage());
+        while (window.pollEvent(event))
+        {
+            for (int i = 0; i < 4; ++i) {
+                auto currDoors = floor1.getRooms()[currRoomID].getDoors();
+                if(pc.getGlobalBounds().intersects(currDoors[i].getGlobalBounds())){
+                    switch (i){
+                        case 0:
+                            if(currDoors[i].isVisable() && !currDoors[i].isLocked()) {
+                                floor1.moveRoom("north");
+                                pc.setPosition(currDoors[3].getPosition().x, currDoors[3].getPosition().y - 100);
+                            }
+                            break;
+                        case 1:
+                            if(currDoors[i].isVisable() && !currDoors[i].isLocked()) {
+                                floor1.moveRoom("west");
+                                pc.setPosition(currDoors[2].getPosition().x - 100, currDoors[2].getPosition().y);
+                            }
+                            break;
+                        case 2:
+                            if(currDoors[i].isVisable() && !currDoors[i].isLocked()) {
+                                floor1.moveRoom("east");
+                                pc.setPosition(currDoors[1].getPosition().x + 100, currDoors[1].getPosition().y);
+                            }
+                            break;
+                        case 3:
+                            if(currDoors[i].isVisable() && !currDoors[i].isLocked()) {
+                                floor1.moveRoom("south");
+                                pc.setPosition(currDoors[0].getPosition().x, currDoors[0].getPosition().y + 100);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                currRoomID = floor1.getCurrPos();
+            }
+            if(floor1.getRooms()[currRoomID].isBossRoom()){
+                floor1.getRooms()[currRoomID].setDoorsLocked(true);
+                snakeBoss.setAlive(true);
+            }
+            // "close requested" event: we close the window
+            if (event.type == sf::Event::Closed) {
+                window.close();
+            } else if (event.type == sf::Event::KeyReleased) {
+                if (event.key.code == sf::Keyboard::W) {
+                    floor1.moveRoom("north");
+                } else if (event.key.code == sf::Keyboard::A) {
+                    floor1.moveRoom("west");
+                } else if (event.key.code == sf::Keyboard::S) {
+                    floor1.moveRoom("south");
+                } else if (event.key.code == sf::Keyboard::D) {
+                    floor1.moveRoom("east");
+                }
+                currRoomID = floor1.getCurrPos();
+            } else if (event.type == sf::Event::MouseButtonPressed) {
+                    Bullet* newBullet = new Bullet(pc.getDamage());
+                    newBullet->setPosition(pc.getPosition());
+                    newBullet->rotate(pc.getAngle());
+                    bullets.addBullet(newBullet);
+                }
+        }
+        auto tempPCPos = pc.getPosition();
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) ){
+            tempPCPos.x -= 10.f;
+            if(floor1.getRooms()[currRoomID].getGlobalBounds().contains(tempPCPos)){
+                pc.move(-10.f, 0.f);
+            }
+        }
 
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+            tempPCPos.y -= 10.f;
+            if(floor1.getRooms()[currRoomID].getGlobalBounds().contains(tempPCPos)) {
+                pc.move(0.f, -10.f);
+            }
+        }
 
-	EnemyList enemyList;
-	Enemy* testGuy =new Enemy(1);
-	testGuy->setOrigin(160,160);
-	enemyList.add(*testGuy);
-	testGuy->setPosition(300, 300);
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+            tempPCPos.y += 10.f;
+            if(floor1.getRooms()[currRoomID].getGlobalBounds().contains(tempPCPos)) {
+                pc.move(0.f, 10.f);
+            }
+        }
 
-	// run the program as long as the window is open
-	while (window.isOpen())
-	{
-		// check all the window's events that were triggered since the last iteration of the loop
-		sf::Event event;
-		Bullet newBullet(pc.getDamage());
-		while (window.pollEvent(event))
-		{
-			// "close requested" event: we close the window
-			if (event.type == sf::Event::Closed)
-				window.close();
-			if (event.type == sf::Event::MouseButtonPressed && (pc.getCounter() > 59)) {
-				Bullet* newBullet = new Bullet(pc.getDamage());
-				newBullet->setPosition(pc.getPosition());
-				newBullet->rotate(pc.getAngle());
-				bullets.addBullet(newBullet);
-				pc.resetCounter();
-			}
-			pc.incrementCounter();
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) ){
+            tempPCPos.x += 10.f;
+            if(floor1.getRooms()[currRoomID].getGlobalBounds().contains(tempPCPos)) {
+                pc.move(10.f, 0.f);
+            }
+        }
+        if(snakeBoss.isAlive()){
+            snakeBoss.update();
+        }
 
-			
-		}
+        window.clear();
+        window.draw(floor1);
+        auto currRoom = floor1.getRooms()[currRoomID];
+        window.draw(currRoom);
+        for (int i = 0; i < 4 ; ++i) {
+            if(currRoom.getDoors()[i].isVisable()) {
+                window.draw(currRoom.getDoors()[i]);
+            }
+        }
+        bullets.updateBullets(window);
+        //Stuff to upload because mess
+        window.draw(pc);
+        //window.draw(floor1.getRooms()[currRoomID].getEnemies()[0]);
+        pc.pointMouseCursor(window);
+        if(snakeBoss.isAlive()){
+            for (const auto &tail : snakeBoss.getTails()) {
+                window.draw(tail);
+            }
+            window.draw(snakeBoss);
+        }
+        auto mousePos = sf::Mouse::getPosition(window);
+        auto mouseCords = window.mapPixelToCoords(mousePos);
+        crosshair.setPosition(mouseCords);
+        window.draw(crosshair);
+        window.display();
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
-			pc.move(-10.f, 0.f);
-		}
+    }
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-			pc.move(0.f,-10.f);
-		}
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-			pc.move(0.f, 10.f);
-		}
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D)){
-			pc.move(10.f, 0.f);
-		}
-
-		window.clear();
-		ui.draw(window, &pc);
-		bullets.updateBullets(window);
-		//Stuff to upload because mess
-		window.draw(pc);
-		pc.pointMouseCursor(window);
-		crosshair.setPosition(sf::Mouse::getPosition().x,sf::Mouse::getPosition().y);
-		window.draw(crosshair);
-		testGuy->moveTowardPoint(pc.getPosition().x, pc.getPosition().y);
-		window.draw(*testGuy);
-		window.display();
-
-	}
-
-	return 0;
+    return 0;
 }
