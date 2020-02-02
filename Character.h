@@ -49,7 +49,9 @@ public:
 
 	bool isHidden();
 
-	//Setters
+    bool isAlive() const;
+
+    //Setters
 	void setHidden(bool x);
 	void setMs(float x);
 	void setDamage(float x);

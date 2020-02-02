@@ -1,6 +1,6 @@
 #include "ProgressBar.h"
 
-ProgressBar::ProgressBar(sf::RenderWindow& window)
+ProgressBar::ProgressBar()
 {
 	this->locX = 10;
 	this->locY = 20;

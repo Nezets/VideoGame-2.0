@@ -49,3 +49,7 @@ void PC::upgradeLevel(short type)
 {
 
 }
+
+int PC::getMaxExp() {
+    return 0;
+}

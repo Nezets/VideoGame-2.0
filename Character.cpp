@@ -23,7 +23,7 @@ Character::Character() {
 	//Level Stats
 
 	//Flags
-	alive = false;
+	alive = true;
 	moving = false;
 	hidden = false;
 
@@ -201,5 +201,9 @@ void Character::moveToPos(float x, float y)
 
 //End Game Functions
 void Character::death() {
+    this->alive = false;
+}
 
+bool Character::isAlive() const {
+    return alive;
 }
