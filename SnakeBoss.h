@@ -12,19 +12,19 @@
 class SnakeBoss : public sf::Sprite {
     struct tail : public sf::Sprite{
         tail();
+        string direction;
     };
     vector<tail> tails;
     bool alive;
     int hp;
+    int count;
+    string direction;
 
 public:
     SnakeBoss();
     void update();
-
     bool isAlive();
-
     vector<tail> &getTails();
-
     void setAlive(bool alive);
 };
 
